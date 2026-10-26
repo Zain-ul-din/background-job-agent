@@ -1,24 +1,22 @@
 import { Router } from "express";
-import { applyForJobPost, classifyJobPosting } from "../lib/ai";
+import { inngest } from "../ingest";
 
 const processRoute = Router();
 
 processRoute.post("/", async (req, res) => {
   const body = req.body;
 
-  const jobPost = {
-    post: body.post,
-    postedAt: new Date(),
-  };
+  await inngest.send({
+    id: `job-post-${body.id}`,
+    name: "agent/job.process",
+    data: {
+      post: body.post,
+    },
+  });
 
-  const response = await classifyJobPosting(jobPost);
-
-  if (response.output.classification === "not_relevant")
-    return res.status(201).json({ success: true, stop_reason: "not-relevant" });
-
-  await applyForJobPost(jobPost, response.output);
-
-  res.status(201).json({ success: true, response });
+  res.status(200).json({
+    success: true,
+  });
 });
 
 export { processRoute };

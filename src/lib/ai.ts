@@ -3,26 +3,7 @@ import { generateText, Output } from "ai";
 import type { JobPost } from "./types";
 
 import { encode } from "@toon-format/toon";
-import z from "zod";
-import { extractUrls, extractEmails } from "./utils/parsers";
-import { sendEmail } from "../services/email-service";
-import { loadTemplate } from "./load-template";
-
-const classificationSchema = z.object({
-  classification: z.enum(["relevant", "not_relevant"]),
-  confidence: z.number().min(0).max(1),
-  recommendedResume: z
-    .enum(["full-stack", "ai-engineering", "frontend-developer"])
-    .describe("What is recommended resume to apply for this job?"),
-});
-
-type ClassificationSchema = z.infer<typeof classificationSchema>;
-
-const roles: Record<ClassificationSchema["recommendedResume"], string> = {
-  "ai-engineering": "AI Engineering",
-  "full-stack": "Full Stack Developer",
-  "frontend-developer": "Frontend Developer",
-};
+import { classificationSchema } from "./schema";
 
 export async function classifyJobPosting(post: JobPost) {
   const instructions = `Classify the relevance of the job posting to help developer apply, with following skills:
@@ -45,31 +26,4 @@ Assumptions: Assume developer is aware of all the best practices and intricacies
   });
 
   return response;
-}
-
-export async function applyForJobPost(
-  post: JobPost,
-  classification: ClassificationSchema,
-) {
-  const emails = extractEmails(post.post);
-  const urls = extractUrls(post.post);
-  const resumeClassification = classification.recommendedResume;
-
-  if (emails.length > 0) {
-    const promises = await Promise.allSettled(
-      emails.map(async (email) => {
-        await sendEmail({
-          to: email,
-          subject: `Application for ${roles[resumeClassification]}`,
-          text: loadTemplate({ role: roles[resumeClassification] }),
-        });
-      }),
-    );
-
-    console.log(JSON.stringify(promises));
-  }
-
-  if (urls.length > 0) {
-    // We'll figure out this
-  }
 }

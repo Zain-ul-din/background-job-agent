@@ -2,6 +2,8 @@ import "dotenv/config";
 import express from "express";
 import { processRoute } from "./routes/process-route";
 import { healthRoute } from "./routes/health-route";
+import { serve } from "inngest/express";
+import { functions, inngest } from "./ingest";
 
 const app = express();
 
@@ -10,6 +12,8 @@ app.use(express.urlencoded({ extended: true }));
 
 app.use("/process", processRoute);
 app.use("/health", healthRoute);
+
+app.use("/api/inngest", serve({ client: inngest, functions: functions }));
 
 const port = process.env.PORT ?? 3010;
 app.listen(port, () => {

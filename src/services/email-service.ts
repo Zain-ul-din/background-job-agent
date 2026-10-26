@@ -1,4 +1,3 @@
-import { readFile } from "node:fs/promises";
 import { createTransport, type SendMailOptions } from "nodemailer";
 
 function escapeHtml(value: string): string {
