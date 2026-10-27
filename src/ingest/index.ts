@@ -62,7 +62,7 @@ const jobAgent = inngest.createFunction(
     for (let i = 0; i < outReachHandOffs.handoffs.length; i += 1) {
       const handoff = outReachHandOffs.handoffs[i];
       await step.run(`save-outreach-handoff-${i}`, async () => {
-        const res = await saveOutReachHandOff(handoff);
+        const res = await saveOutReachHandOff(run.id, handoff);
         return res;
       });
     }

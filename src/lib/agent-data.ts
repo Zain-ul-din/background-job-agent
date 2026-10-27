@@ -67,10 +67,12 @@ export async function saveEmailThread(
 }
 
 export async function saveOutReachHandOff(
+  runId: string,
   handoff: OutReachHandOffSchema["handoffs"][number],
 ) {
   return await db.insert(outReachHandOffsTable).values({
     id: randomUUID(),
+    run_id: runId,
     instructions: handoff.instructions,
     acceptance_criteria: handoff.acceptanceCriteria,
   });
