@@ -1,5 +1,6 @@
 import { Router } from "express";
 import { inngest } from "../ingest";
+import { randomUUID } from "node:crypto";
 
 const processRoute = Router();
 
@@ -10,6 +11,7 @@ processRoute.post("/", async (req, res) => {
     id: `job-post-${body.id}`,
     name: "agent/job.process",
     data: {
+      id: randomUUID(),
       post: body.post,
     },
   });

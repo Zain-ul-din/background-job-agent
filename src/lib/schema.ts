@@ -8,4 +8,16 @@ export const classificationSchema = z.object({
     .describe("What is recommended resume to apply for this job?"),
 });
 
+export const outReachHandOffsSchema = z.object({
+  handoffs: z.array(
+    z.object({
+      instructions: z.string(),
+      acceptanceCriteria: z
+        .string()
+        .describe("what criteria should meet in order to report back?"),
+    }),
+  ),
+});
+
+export type OutReachHandOffSchema = z.infer<typeof outReachHandOffsSchema>;
 export type ClassificationSchema = z.infer<typeof classificationSchema>;
