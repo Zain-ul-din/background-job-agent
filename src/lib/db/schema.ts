@@ -47,7 +47,9 @@ export const jobPostClassificationsTable = sqliteTable(
 
 export const outReachHandOffsTable = sqliteTable("outreach_handoffs", {
   id: text().primaryKey(),
-  run_id: text().references(() => runsTable.id, { onDelete: "cascade" }),
+  run_id: text()
+    .notNull()
+    .references(() => runsTable.id, { onDelete: "cascade" }),
   instructions: text().notNull(),
   acceptance_criteria: text().notNull(),
   status: text().default("pending"), // "fail" | "success" | "pending"
