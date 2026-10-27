@@ -6,6 +6,7 @@ import { serve } from "inngest/express";
 import { functions, inngest } from "./ingest";
 import { googleAuthRoute } from "./routes/google-auth-route";
 import { gmailRoute } from "./routes/gmail-route";
+import { initAuth } from "./lib/auth";
 
 const app = express();
 
@@ -22,4 +23,6 @@ app.use("/api/inngest", serve({ client: inngest, functions: functions }));
 const port = process.env.PORT ?? 3010;
 app.listen(port, () => {
   console.log(`server is running at localhost:${port}`);
+
+  initAuth();
 });

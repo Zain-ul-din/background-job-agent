@@ -1,6 +1,8 @@
 import { Router } from "express";
 import { googleOAuth } from "../lib/google-oauth";
 import { randomBytes } from "node:crypto";
+import { db } from "../lib/db/db";
+import { oAuthSessionsTable } from "../lib/db/schema";
 
 const googleAuthRoute = Router();
 
@@ -8,19 +10,19 @@ const googleAuthRoute = Router();
 // TODO: replace this with random string in production
 const authStates = new Map<string, number>();
 
-googleAuthRoute.get("/", async (_, res) => {
-  const scope = [
-    "https://www.googleapis.com/auth/gmail.readonly",
-    "https://www.googleapis.com/auth/gmail.send",
-    "https://www.googleapis.com/auth/gmail.modify",
-  ];
+const scopes = [
+  "https://www.googleapis.com/auth/gmail.readonly",
+  "https://www.googleapis.com/auth/gmail.send",
+  "https://www.googleapis.com/auth/gmail.modify",
+];
 
+googleAuthRoute.get("/", async (_, res) => {
   const state = randomBytes(32).toString("hex");
   authStates.set(state, Date.now() + 10 * 60_000);
 
   const url = googleOAuth.generateAuthUrl({
     access_type: "offline",
-    scope,
+    scope: scopes,
     state,
     prompt: "consent",
     redirect_uri: `${process.env.BASE_URL}/auth/google/callback`,
@@ -37,7 +39,7 @@ googleAuthRoute.get("/callback", async (req, res) => {
   if (typeof code !== "string" || typeof state !== "string")
     return res.status(400).send("Invalid OAuth Callback");
 
-  const expiredAt = authStates.get(state as string);
+  const expiredAt = authStates.get(state);
   authStates.delete(state);
 
   if (!expiredAt || expiredAt < Date.now())
@@ -45,9 +47,30 @@ googleAuthRoute.get("/callback", async (req, res) => {
 
   try {
     const { tokens } = await googleOAuth.getToken(code);
-    res.send(tokens);
+
+    if (!tokens.access_token || !tokens.refresh_token)
+      return res.status(500).send("Google did not return required tokens");
+
+    const values = {
+      access_token: tokens.access_token,
+      refresh_token: tokens.refresh_token,
+      scope: tokens.scope ?? scopes.join(" "),
+      token_type: tokens.token_type ?? "Bearer",
+      refresh_token_expires_in: null,
+      expiry_date: tokens.expiry_date ?? null,
+    };
+
+    await db
+      .insert(oAuthSessionsTable)
+      .values({ provider: "google", ...values })
+      .onConflictDoUpdate({
+        target: oAuthSessionsTable.provider,
+        set: values,
+      });
+
+    res.send("Google account connected successfully");
   } catch (err) {
-    console.error("OAuth token exchange failed", error);
+    console.error("OAuth token exchange failed", err);
     res.status(500).send("Google connection failed");
   }
 });
