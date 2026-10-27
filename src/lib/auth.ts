@@ -12,7 +12,14 @@ function updateGoogleOAuthSession() {
         refresh_token: newTokens.refresh_token ?? undefined,
         expiry_date: newTokens.expiry_date ?? undefined,
       })
-      .where(eq(oAuthSessionsTable.provider, "google"));
+      .where(eq(oAuthSessionsTable.provider, "google"))
+      .then((res) => {
+        if (res.rowsAffected === 0)
+          console.warn("tokens event: no oauth row to update");
+      })
+      .catch((err) => {
+        console.error("Failed to persist refreshed tokens", err);
+      });
   });
 }
 
