@@ -22,7 +22,7 @@ Assumptions: Assume developer is aware of all the best practices and intricacies
       schema: classificationSchema,
     }),
     prompt: encode(post),
-    reasoning: "low",
+    reasoning: "medium",
   });
 
   return response;
