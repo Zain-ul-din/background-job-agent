@@ -23,6 +23,7 @@
   },
   "dependencies": {
     "@ai-sdk/mistral": "^4.0.72",
+    "@ai-sdk/openai": "^4.0.104",
     "@clack/prompts": "^1.8.1",
     "@libsql/client": "^0.18.0",
     "@modelcontextprotocol/server": "^2.4.0",

@@ -1,4 +1,3 @@
-import { mistral } from "@ai-sdk/mistral";
 import { generateText, Output } from "ai";
 import { encode } from "@toon-format/toon";
 import { buildClassificationSchema, outReachHandOffsSchema } from "./schema";
@@ -6,8 +5,10 @@ import { InferSelectModel } from "drizzle-orm";
 import { rolesTable, runsTable } from "./db/schema";
 import type { JobPost } from "./types";
 import { db } from "./db";
+import { models } from "./models";
+import { config } from "../config";
 
-const MODEL = mistral("mistral-small-2603");
+const MODEL = models[config.model];
 
 export async function classifyJobPosting(post: JobPost) {
   const roles = await db.select().from(rolesTable);
