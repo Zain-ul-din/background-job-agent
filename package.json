@@ -6,6 +6,7 @@
   "scripts": {
     "dev": "vite-node ./src/index.ts",
     "db:seed": "vite-node ./scripts/seed-db.ts",
+    "mcp": "vite-node ./scripts/outreach-handoffs-mcp.ts",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [],
@@ -15,13 +16,16 @@
   "devDependencies": {
     "@types/express": "^5.0.6",
     "@types/node": "^26.6.5",
+    "concurrently": "^10.0.6",
     "drizzle-kit": "1.0.0-rc.5",
     "tsx": "^4.23.15",
     "vite-node": "^6.0.0"
   },
   "dependencies": {
     "@ai-sdk/mistral": "^4.0.72",
+    "@clack/prompts": "^1.8.1",
     "@libsql/client": "^0.18.0",
+    "@modelcontextprotocol/server": "^2.4.0",
     "@toon-format/toon": "^4.4.0",
     "ai": "^7.0.153",
     "dotenv": "^18.0.9",
@@ -30,6 +34,7 @@
     "googleapis": "^188.0.0",
     "inngest": "^4.26.0",
     "nodemailer": "^10.2.1",
+    "picocolors": "^1.1.1",
     "zod": "^4.6.7"
   }
 }

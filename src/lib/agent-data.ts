@@ -1,5 +1,5 @@
 import { eq } from "drizzle-orm";
-import { db } from "./db/db";
+import { db } from "./db";
 import {
   emailThreadsTable,
   jobPostClassificationsTable,
@@ -43,7 +43,7 @@ export async function reportClassification(
     run_id: runId,
     classification: classification.classification,
     confidence: classification.confidence,
-    recommendedResume: classification.recommendedResume,
+    recommendedRole: classification.recommendedRole,
   });
 
   return res;

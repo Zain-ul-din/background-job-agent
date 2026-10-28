@@ -1,8 +1,10 @@
 import { Router } from "express";
-import { googleOAuth } from "../lib/google-oauth";
 import { randomBytes } from "node:crypto";
-import { db } from "../lib/db/db";
+import { db } from "../lib/db";
 import { oAuthSessionsTable } from "../lib/db/schema";
+import { eq } from "drizzle-orm";
+import { google } from "googleapis";
+import { googleOAuth } from "../lib/auth/google-oauth";
 
 const googleAuthRoute = Router();
 
@@ -29,6 +31,39 @@ googleAuthRoute.get("/", async (_, res) => {
   });
 
   res.redirect(url);
+});
+
+googleAuthRoute.get("/info", async (_, res) => {
+  try {
+    const [session] = await db
+      .select()
+      .from(oAuthSessionsTable)
+      .where(eq(oAuthSessionsTable.provider, "google"))
+      .limit(1);
+
+    if (!session) return res.json({ user: null });
+
+    googleOAuth.setCredentials({
+      access_token: session.access_token,
+      refresh_token: session.refresh_token,
+      expiry_date: session.expiry_date ?? undefined,
+    });
+
+    const oauth = google.oauth2({
+      version: "v2",
+      auth: googleOAuth,
+    });
+
+    const { data } = await oauth.userinfo.get();
+
+    res.json({
+      user: data,
+    });
+  } catch (err) {
+    res.send(500).json({
+      user: null,
+    });
+  }
 });
 
 googleAuthRoute.get("/callback", async (req, res) => {

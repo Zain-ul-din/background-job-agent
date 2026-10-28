@@ -1,6 +1,6 @@
 import { eq } from "drizzle-orm";
-import { db } from "./db/db";
-import { oAuthSessionsTable } from "./db/schema";
+import { db } from "../db";
+import { oAuthSessionsTable } from "../db/schema";
 import { googleOAuth } from "./google-oauth";
 
 function updateGoogleOAuthSession() {

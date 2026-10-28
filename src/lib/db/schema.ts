@@ -5,6 +5,14 @@ import {
   type AnySQLiteColumn,
 } from "drizzle-orm/sqlite-core";
 
+export const rolesTable = sqliteTable("roles", {
+  slug: text().primaryKey(),
+  name: text().notNull(),
+  email_template: text().notNull(),
+  email_subject: text().notNull(),
+  skills: text().notNull(),
+});
+
 export const oAuthSessionsTable = sqliteTable("oauth_sessions", {
   provider: text().primaryKey(),
   access_token: text().notNull(),
@@ -35,7 +43,7 @@ export const jobPostClassificationsTable = sqliteTable(
       .references(() => runsTable.id, { onDelete: "cascade" }),
     classification: text().notNull(),
     confidence: int().notNull(),
-    recommendedResume: text().notNull(),
+    recommendedRole: text().notNull(),
     created_at: int()
       .notNull()
       .$defaultFn(() => Date.now()),

@@ -1,8 +1,8 @@
 import { google } from "googleapis";
-import { googleOAuth } from "./google-oauth";
-import { db } from "./db/db";
-import { oAuthSessionsTable } from "./db/schema";
+import { db } from "../db";
+import { oAuthSessionsTable } from "../db/schema";
 import { eq } from "drizzle-orm";
+import { googleOAuth } from "../auth/google-oauth";
 
 export async function createGmailClient() {
   const [session] = await db
