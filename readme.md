@@ -1,3 +1,9 @@
+# Background Job Agent
+
+A background agent that sends emails to recruiters. `More is coming soon...`
+
+## How it works?
+
 ## Setup guide
 
 Run Inngest:
