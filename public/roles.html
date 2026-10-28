@@ -1,0 +1,395 @@
+<!doctype html>
+<html>
+  <head>
+    <title>Setup Roles</title>
+    <style>
+      :root {
+        --bg-primary: #e8e6e1;
+        --bg-secondary: #d4d0c8;
+        --bg-card: #f0eee9;
+        --text-primary: #2c2c2c;
+        --text-secondary: #5c5c5c;
+        --border: #b8b4ae;
+        --button-bg: #6b665e;
+        --button-hover: #5a554d;
+      }
+
+      [data-theme="dark"] {
+        --bg-primary: #1a1a1a;
+        --bg-secondary: #2a2a2a;
+        --bg-card: #242424;
+        --text-primary: #e0e0e0;
+        --text-secondary: #a0a0a0;
+        --border: #3a3a3a;
+        --button-bg: #8a8580;
+        --button-hover: #9a958f;
+      }
+
+      * {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+      }
+      body {
+        font-family:
+          -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+        background: var(--bg-primary);
+        color: var(--text-primary);
+        min-height: 100vh;
+        padding: 40px 20px;
+        transition:
+          background 0.3s,
+          color 0.3s;
+      }
+      .container {
+        max-width: 800px;
+        margin: 0 auto;
+      }
+      .header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 30px;
+      }
+      h1 {
+        font-size: 24px;
+        font-weight: 500;
+      }
+      .theme-toggle {
+        background: var(--bg-card);
+        border: 1px solid var(--border);
+        color: var(--text-primary);
+        padding: 8px 16px;
+        cursor: pointer;
+        font-size: 14px;
+      }
+      .card {
+        background: var(--bg-card);
+        border: 1px solid var(--border);
+        padding: 24px;
+        margin-bottom: 24px;
+      }
+      .card h2 {
+        color: var(--text-primary);
+        margin-bottom: 16px;
+        font-size: 18px;
+        font-weight: 500;
+      }
+      .form-group {
+        margin-bottom: 16px;
+      }
+      label {
+        display: block;
+        margin-bottom: 6px;
+        font-weight: 500;
+        color: var(--text-primary);
+        font-size: 14px;
+      }
+      input,
+      textarea {
+        width: 100%;
+        padding: 10px;
+        border: 1px solid var(--border);
+        background: var(--bg-primary);
+        color: var(--text-primary);
+        font-size: 14px;
+        font-family: inherit;
+      }
+      input:focus,
+      textarea:focus {
+        outline: 1px solid var(--button-bg);
+      }
+      textarea {
+        min-height: 80px;
+        resize: vertical;
+      }
+      button {
+        background: var(--button-bg);
+        color: var(--text-primary);
+        padding: 10px 20px;
+        border: none;
+        cursor: pointer;
+        font-size: 14px;
+      }
+      button:hover {
+        background: var(--button-hover);
+      }
+      button.secondary {
+        background: var(--bg-secondary);
+        border: 1px solid var(--border);
+      }
+      button.edit,
+      button.delete {
+        background: var(--bg-secondary);
+        border: 1px solid var(--border);
+      }
+      #roles-list {
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+      }
+      .role-item {
+        background: var(--bg-secondary);
+        border: 1px solid var(--border);
+        padding: 16px;
+      }
+      .role-item h3 {
+        color: var(--text-primary);
+        margin-bottom: 6px;
+        font-size: 16px;
+        font-weight: 500;
+      }
+      .role-item p {
+        color: var(--text-secondary);
+        font-size: 14px;
+        margin-bottom: 8px;
+      }
+      .role-item .skills {
+        color: var(--text-secondary);
+        font-size: 13px;
+        margin-bottom: 12px;
+      }
+      .role-item .actions {
+        display: flex;
+        gap: 8px;
+      }
+      .role-item .actions button {
+        padding: 6px 12px;
+        font-size: 13px;
+      }
+      #edit-section {
+        display: none;
+        background: var(--bg-card);
+        border: 1px solid var(--border);
+        padding: 16px;
+        margin-top: 16px;
+      }
+      #edit-section h3 {
+        color: var(--text-primary);
+        margin-bottom: 12px;
+        font-size: 16px;
+        font-weight: 500;
+      }
+      .empty-state {
+        text-align: center;
+        padding: 40px;
+        color: var(--text-secondary);
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <div class="header">
+        <h1>Target Roles</h1>
+        <button class="theme-toggle" onclick="toggleTheme()">
+          Toggle Theme
+        </button>
+      </div>
+
+      <div class="card">
+        <h2>Add New Role</h2>
+        <form id="role-form">
+          <div class="form-group">
+            <label>Role Name</label>
+            <input
+              type="text"
+              id="name"
+              placeholder="e.g., Senior Frontend Engineer"
+              required
+            />
+          </div>
+          <div class="form-group">
+            <label>Email Template</label>
+            <textarea
+              id="email_template"
+              placeholder="How you want to introduce yourself..."
+              required
+            ></textarea>
+          </div>
+          <div class="form-group">
+            <label>Email Subject</label>
+            <input
+              type="text"
+              id="email_subject"
+              placeholder="e.g., Application for Senior Frontend Engineer"
+              required
+            />
+          </div>
+          <div class="form-group">
+            <label>Key Skills</label>
+            <input
+              type="text"
+              id="skills"
+              placeholder="e.g., React, TypeScript, Node.js"
+              required
+            />
+          </div>
+          <button type="submit">Add Role</button>
+        </form>
+      </div>
+
+      <div id="edit-section">
+        <h3>Edit Role</h3>
+        <form id="edit-form">
+          <input type="hidden" id="edit-slug" />
+          <div class="form-group">
+            <label>Role Name</label>
+            <input type="text" id="edit-name" required />
+          </div>
+          <div class="form-group">
+            <label>Email Template</label>
+            <textarea id="edit-email_template" required></textarea>
+          </div>
+          <div class="form-group">
+            <label>Email Subject</label>
+            <input type="text" id="edit-email_subject" required />
+          </div>
+          <div class="form-group">
+            <label>Key Skills</label>
+            <input type="text" id="edit-skills" required />
+          </div>
+          <button type="submit">Update Role</button>
+          <button type="button" class="secondary" onclick="cancelEdit()">
+            Cancel
+          </button>
+        </form>
+      </div>
+
+      <div class="card">
+        <h2>Your Roles</h2>
+        <div id="roles-list"></div>
+      </div>
+    </div>
+
+    <script>
+      function toggleTheme() {
+        const html = document.documentElement;
+        const current = html.getAttribute("data-theme");
+        html.setAttribute("data-theme", current === "dark" ? "light" : "dark");
+        localStorage.setItem("theme", current === "dark" ? "light" : "dark");
+      }
+
+      // Load saved theme
+      const savedTheme = localStorage.getItem("theme");
+      if (savedTheme) {
+        document.documentElement.setAttribute("data-theme", savedTheme);
+      }
+
+      async function loadRoles() {
+        try {
+          const res = await fetch("/roles");
+          const roles = await res.json();
+          const list = document.getElementById("roles-list");
+
+          if (roles.length === 0) {
+            list.innerHTML =
+              '<div class="empty-state">No roles added yet. Add your first role above.</div>';
+            return;
+          }
+
+          list.innerHTML = roles
+            .map(
+              (r) => `
+          <div class="role-item">
+            <h3>${r.name}</h3>
+            <p><strong>Subject:</strong> ${r.email_subject}</p>
+            <div class="skills"><strong>Skills:</strong> ${r.skills}</div>
+            <div class="actions">
+              <button class="edit" onclick="editRole('${r.slug}')">Edit</button>
+              <button class="delete" onclick="deleteRole('${r.slug}')">Delete</button>
+            </div>
+          </div>
+        `,
+            )
+            .join("");
+        } catch (err) {
+          console.error("Failed to load roles:", err);
+          document.getElementById("roles-list").innerHTML =
+            '<p style="color: var(--text-secondary); text-align: center;">Failed to load roles. Check console for details.</p>';
+        }
+      }
+
+      document
+        .getElementById("role-form")
+        .addEventListener("submit", async (e) => {
+          e.preventDefault();
+          const data = {
+            name: document.getElementById("name").value,
+            email_template: document.getElementById("email_template").value,
+            email_subject: document.getElementById("email_subject").value,
+            skills: document.getElementById("skills").value,
+          };
+
+          const res = await fetch("/roles", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(data),
+          });
+
+          if (res.ok) {
+            document.getElementById("role-form").reset();
+            loadRoles();
+          }
+        });
+
+      document
+        .getElementById("edit-form")
+        .addEventListener("submit", async (e) => {
+          e.preventDefault();
+          const slug = document.getElementById("edit-slug").value;
+          const data = {
+            name: document.getElementById("edit-name").value,
+            email_template: document.getElementById("edit-email_template")
+              .value,
+            email_subject: document.getElementById("edit-email_subject").value,
+            skills: document.getElementById("edit-skills").value,
+          };
+
+          const res = await fetch("/roles/" + slug, {
+            method: "PUT",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(data),
+          });
+
+          if (res.ok) {
+            cancelEdit();
+            loadRoles();
+          }
+        });
+
+      async function editRole(slug) {
+        const res = await fetch("/roles");
+        const roles = await res.json();
+        const role = roles.find((r) => r.slug === slug);
+
+        if (role) {
+          document.getElementById("edit-slug").value = role.slug;
+          document.getElementById("edit-name").value = role.name;
+          document.getElementById("edit-email_template").value =
+            role.email_template;
+          document.getElementById("edit-email_subject").value =
+            role.email_subject;
+          document.getElementById("edit-skills").value = role.skills;
+          document.getElementById("edit-section").style.display = "block";
+          document
+            .getElementById("edit-section")
+            .scrollIntoView({ behavior: "smooth" });
+        }
+      }
+
+      function cancelEdit() {
+        document.getElementById("edit-section").style.display = "none";
+        document.getElementById("edit-form").reset();
+      }
+
+      async function deleteRole(slug) {
+        if (confirm("Delete this role?")) {
+          const res = await fetch("/roles/" + slug, { method: "DELETE" });
+          if (res.ok) loadRoles();
+        }
+      }
+
+      loadRoles();
+    </script>
+  </body>
+</html>

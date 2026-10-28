@@ -19,12 +19,17 @@ services:
 
   inngest:
     image: inngest/inngest:latest
-    environment:
-      - INNGEST_EVENT_KEY=test-key
-      - INNGEST_SIGNING_KEY=test-signing-key
-      - POSTGRES_URI=postgresql://postgres:postgres@postgres:5432/inngest
+    command:
+      [
+        "inngest",
+        "dev",
+        "-p",
+        "8288",
+        "--sdk-url",
+        "http://host.docker.internal:3010/api/inngest",
+      ]
     ports:
-      - "8282:8282"
+      - "8282:8288"
     depends_on:
       postgres:
         condition: service_healthy
