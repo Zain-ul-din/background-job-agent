@@ -4,7 +4,7 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "dev": "vite-node ./src/index.ts",
+    "dev": "concurrently \"vite-node ./src/index.ts\" \"npx --ignore-scripts=false inngest-cli@latest dev -u http://localhost:3010/api/inngest\"",
     "db:seed": "vite-node ./scripts/seed-db.ts",
     "mcp": "vite-node ./scripts/outreach-handoffs-mcp.ts",
     "test": "echo \"Error: no test specified\" && exit 1"

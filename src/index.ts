@@ -6,7 +6,6 @@ import { serve } from "inngest/express";
 import { functions, inngest } from "./ingest";
 import { googleAuthRoute } from "./routes/google-auth-route";
 import { initAuth } from "./lib/auth";
-import { runCLI } from "./cli";
 
 const app = express();
 
@@ -24,7 +23,4 @@ app.listen(port, () => {
   console.log(`server is running at localhost:${port}`);
 
   initAuth();
-  runCLI({
-    baseUrl: `http://localhost:${port}`,
-  });
 });
