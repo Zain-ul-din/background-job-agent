@@ -17,20 +17,31 @@ server.registerTool(
     inputSchema: z.object({}),
   },
   async () => {
-    const handoffs = await db
-      .select({
-        runId: runsTable.id,
-        pendingCounts: count(outReachHandOffsTable.id),
-      })
-      .from(outReachHandOffsTable)
-      .leftJoin(runsTable, eq(runsTable.id, outReachHandOffsTable.run_id))
-      .where(eq(outReachHandOffsTable.status, "pending"))
-      .orderBy(asc(runsTable.created_at))
-      .groupBy(runsTable.id);
+    try {
+      const handoffs = await db
+        .select({
+          runId: runsTable.id,
+          pendingCounts: count(outReachHandOffsTable.id),
+        })
+        .from(outReachHandOffsTable)
+        .leftJoin(runsTable, eq(runsTable.id, outReachHandOffsTable.run_id))
+        .where(eq(outReachHandOffsTable.status, "pending"))
+        .orderBy(asc(runsTable.created_at))
+        .groupBy(runsTable.id);
 
-    return {
-      content: [{ type: "text", text: encode(handoffs) }],
-    };
+      return {
+        content: [{ type: "text", text: encode(handoffs) }],
+      };
+    } catch (err) {
+      return {
+        content: [
+          {
+            type: "text",
+            text: `Failed to get handoffs: ${err instanceof Error ? err.message : String(err)}`,
+          },
+        ],
+      };
+    }
   },
 );
 
@@ -41,15 +52,29 @@ server.registerTool(
     inputSchema: z.object({ runId: z.string() }),
   },
   async ({ runId }) => {
-    const run = db.select().from(runsTable).where(eq(runsTable.id, runId));
-    return {
-      content: [
-        {
-          type: "text",
-          text: encode(run),
-        },
-      ],
-    };
+    try {
+      const run = await db
+        .select()
+        .from(runsTable)
+        .where(eq(runsTable.id, runId));
+      return {
+        content: [
+          {
+            type: "text",
+            text: encode(run),
+          },
+        ],
+      };
+    } catch (err) {
+      return {
+        content: [
+          {
+            type: "text",
+            text: `Failed to get run: ${err instanceof Error ? err.message : String(err)}`,
+          },
+        ],
+      };
+    }
   },
 );
 
@@ -62,19 +87,30 @@ server.registerTool(
     }),
   },
   async ({ handoffIds }) => {
-    const handoffs = db
-      .select()
-      .from(outReachHandOffsTable)
-      .where(inArray(outReachHandOffsTable.id, handoffIds));
+    try {
+      const handoffs = await db
+        .select()
+        .from(outReachHandOffsTable)
+        .where(inArray(outReachHandOffsTable.id, handoffIds));
 
-    return {
-      content: [
-        {
-          type: "text",
-          text: encode(handoffs),
-        },
-      ],
-    };
+      return {
+        content: [
+          {
+            type: "text",
+            text: encode(handoffs),
+          },
+        ],
+      };
+    } catch (err) {
+      return {
+        content: [
+          {
+            type: "text",
+            text: `Failed to get handoffs by ids: ${err instanceof Error ? err.message : String(err)}`,
+          },
+        ],
+      };
+    }
   },
 );
 
@@ -111,7 +147,7 @@ server.registerTool(
         content: [
           {
             type: "text",
-            text: `Failed to report ${handOffId}`,
+            text: `Failed to report ${handOffId}: ${err instanceof Error ? err.message : String(err)}`,
           },
         ],
       };

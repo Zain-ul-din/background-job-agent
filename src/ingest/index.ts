@@ -10,7 +10,11 @@ import {
   saveOutReachHandOff,
 } from "../lib/agent-data";
 
-export const inngest = new Inngest({ id: "my-app" });
+export const inngest = new Inngest({
+  id: "my-app",
+  eventKey: process.env.INNGEST_EVENT_KEY || "test-key",
+  signingKey: process.env.INNGEST_SIGNING_KEY || "test-signing-key",
+});
 
 const jobAgent = inngest.createFunction(
   {

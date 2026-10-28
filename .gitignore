@@ -5,3 +5,9 @@
 
 # local databases
 *.db
+
+# WhatsApp auth state
+.whatsapp_auth
+
+# Job sources configuration
+sources.json
