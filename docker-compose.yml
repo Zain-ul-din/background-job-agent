@@ -29,7 +29,7 @@ services:
         "http://host.docker.internal:3010/api/inngest",
       ]
     ports:
-      - "8282:8288"
+      - "8288:8288"
     depends_on:
       postgres:
         condition: service_healthy

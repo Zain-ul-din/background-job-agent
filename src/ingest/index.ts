@@ -15,7 +15,6 @@ export const inngest = new Inngest({
   eventKey: process.env.INNGEST_EVENT_KEY || "test-key",
   signingKey: process.env.INNGEST_SIGNING_KEY || "test-signing-key",
   isDev: Boolean(process.env.INNGEST_DEV),
-  baseUrl: "http://127.0.0.1:8282",
 });
 
 const jobAgent = inngest.createFunction(
