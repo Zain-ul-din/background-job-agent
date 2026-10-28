@@ -8,6 +8,12 @@ A background agent that sends emails to recruiters. `More is coming soon...`
 
 ## Setup guide
 
+For Simple Setup follow following prompt into your Agentic Harness:
+
+```txt
+Help me with setup of this background-agent
+```
+
 Run Inngest:
 
 ```bash
