@@ -16,6 +16,8 @@ const scopes = [
   "https://www.googleapis.com/auth/gmail.readonly",
   "https://www.googleapis.com/auth/gmail.send",
   "https://www.googleapis.com/auth/gmail.modify",
+  "https://www.googleapis.com/auth/userinfo.profile",
+  "https://www.googleapis.com/auth/userinfo.email",
 ];
 
 googleAuthRoute.get("/", async (_, res) => {
@@ -49,18 +51,16 @@ googleAuthRoute.get("/info", async (_, res) => {
       expiry_date: session.expiry_date ?? undefined,
     });
 
-    const oauth = google.oauth2({
-      version: "v2",
-      auth: googleOAuth,
-    });
+    const { data } = await google
+      .oauth2("v2")
+      .userinfo.get({ auth: googleOAuth });
 
-    const { data } = await oauth.userinfo.get();
-
-    res.json({
+    return res.json({
       user: data,
     });
   } catch (err) {
-    res.send(500).json({
+    console.error("Failed to fetch Google user info:", err);
+    return res.status(500).json({
       user: null,
     });
   }
