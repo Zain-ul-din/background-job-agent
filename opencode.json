@@ -1,0 +1,10 @@
+{
+  "$schema": "https://opencode.ai/config.json",
+  "mcp": {
+    "outreach-handoffs": {
+      "type": "local",
+      "command": ["pnpm", "mcp"],
+      "enabled": true
+    }
+  }
+}
