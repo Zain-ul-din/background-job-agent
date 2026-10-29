@@ -19,6 +19,10 @@ _Note: Some components are under development_
 
 <img width="1193" height="698" alt="Screenshot from 2026-10-27 17-51-35" src="https://github.com/user-attachments/assets/dc00c721-7f05-4d06-a070-85f171f224a9" />
 
+Inngest Dashboard:
+
+<img width="1920" height="1080" alt="image" src="https://github.com/user-attachments/assets/16fe69a4-8595-4a55-a337-41b3745e3f8c" />
+
 ## Quick Start
 
 [Full setup guide →](docs/setup.md)
