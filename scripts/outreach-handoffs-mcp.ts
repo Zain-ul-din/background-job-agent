@@ -79,6 +79,36 @@ server.registerTool(
 );
 
 server.registerTool(
+  "get-handoffs-by-run",
+  {
+    description: "Returns outreach handoffs with details for a given run",
+    inputSchema: z.object({ runId: z.string() }),
+  },
+  async ({ runId }) => {
+    try {
+      const handoffs = await db
+        .select()
+        .from(outReachHandOffsTable)
+        .where(eq(outReachHandOffsTable.run_id, runId))
+        .orderBy(asc(outReachHandOffsTable.created_at));
+
+      return {
+        content: [{ type: "text", text: encode(handoffs) }],
+      };
+    } catch (err) {
+      return {
+        content: [
+          {
+            type: "text",
+            text: `Failed to get handoffs for run ${runId}: ${err instanceof Error ? err.message : String(err)}`,
+          },
+        ],
+      };
+    }
+  },
+);
+
+server.registerTool(
   "get-handoffs-by-ids",
   {
     description: "Returns outreach handoffs with details",
