@@ -38,8 +38,8 @@ const jobAgent = inngest.createFunction(
         post: run.post,
         postedAt: new Date(run.posted_at),
       });
-      await reportClassification(run.id, response.output);
-      return response.output;
+      await reportClassification(run.id, response);
+      return response;
     });
 
     if (classificationRes.classification === "not_relevant")

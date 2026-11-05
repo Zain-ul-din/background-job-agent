@@ -1,31 +1,63 @@
 import { generateText, Output } from "ai";
 import { encode } from "@toon-format/toon";
-import { buildClassificationSchema, outReachHandOffsSchema } from "./schema";
+import { ClassificationSchema, outReachHandOffsSchema } from "./schema";
 import { InferSelectModel } from "drizzle-orm";
 import { rolesTable, runsTable } from "./db/schema";
 import type { JobPost } from "./types";
 import { db } from "./db";
-import { models } from "./models";
+import { decisionModels, models } from "./models";
 import { config } from "../config";
 
+import { experimental_decide as decide } from "ai";
+
 const MODEL = models[config.model];
+const DECISION_MODEL = decisionModels[config.decisionModel];
 
-export async function classifyJobPosting(post: JobPost) {
+export async function classifyJobPosting(
+  post: JobPost,
+): Promise<ClassificationSchema> {
   const roles = await db.select().from(rolesTable);
+  const input = `Rate how relevant a job post is for a person skilled in:\n${encode(post)}`;
+  const isSingleRole = roles.length <= 1;
 
-  const CLASSIFY_INSTRUCTIONS = `Rate how relevant a job post is for a person skilled in:
-${roles.map((role) => `- ${role.name}: ${role.skills}`).join("\n")}
-Mark not_relevant when the role demands deep senior expertise outside these areas.`;
-
-  return generateText({
-    model: MODEL,
-    instructions: CLASSIFY_INSTRUCTIONS,
-    output: Output.object({
-      schema: buildClassificationSchema(roles.map((role) => role.slug)),
-    }),
-    prompt: encode(post),
-    reasoning: "medium",
+  const decision = await decide({
+    model: DECISION_MODEL,
+    state: input,
+    questions: {
+      classification: {
+        type: "choice",
+        criteria: { relevant: "Relevant", not_relevant: "Not Relevant" },
+        instructions:
+          "Mark not_relevant when the role demands deep senior expertise outside these areas.",
+      },
+      ...(isSingleRole
+        ? {}
+        : {
+            recommendedRole: {
+              type: "choice",
+              instructions: "Recommended role for the job post",
+              criteria: Object.fromEntries(
+                roles.map((role) => [role.slug, role.name]),
+              ),
+            },
+          }),
+    },
   });
+
+  const classification = decision.answers["classification"].choice;
+  const classProps = decision.answers["classification"].probabilities;
+
+  const recommendedRole =
+    decision.answers["recommendedRole"] &&
+    decision.answers["recommendedRole"].type === "choice"
+      ? decision.answers["recommendedRole"].choice
+      : roles[0].slug;
+
+  return {
+    classification,
+    confidence: classProps ? classProps[classification] : 0,
+    recommendedRole,
+  };
 }
 
 const HANDOFF_INSTRUCTIONS = `Create outreach tasks that could improve this application. The application email is already sent, skip email tasks.
