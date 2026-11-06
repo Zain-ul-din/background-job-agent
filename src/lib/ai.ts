@@ -1,4 +1,8 @@
-import { generateText, Output } from "ai";
+import {
+  experimental_decide as decide,
+  generateText,
+  Output,
+} from "ai";
 import { encode } from "@toon-format/toon";
 import { ClassificationSchema, outReachHandOffsSchema } from "./schema";
 import { InferSelectModel } from "drizzle-orm";
@@ -8,8 +12,6 @@ import { db } from "./db";
 import { decisionModels, models } from "./models";
 import { config } from "../config";
 
-import { experimental_decide as decide } from "ai";
-
 const MODEL = models[config.model];
 const DECISION_MODEL = decisionModels[config.decisionModel];
 
@@ -17,8 +19,20 @@ export async function classifyJobPosting(
   post: JobPost,
 ): Promise<ClassificationSchema> {
   const roles = await db.select().from(rolesTable);
-  const input = `Rate how relevant a job post is for a person skilled in:\n${encode(post)}`;
-  const isSingleRole = roles.length <= 1;
+  if (roles.length === 0) {
+    throw new Error(
+      "No roles configured. Define at least one role before processing job postings.",
+    );
+  }
+
+  const input = [
+    "Rate how relevant a job post is for a person skilled in:",
+    ...roles.map((role) => `- ${role.name}: ${role.skills}`),
+    "",
+    "Job post:",
+    encode(post),
+  ].join("\n");
+  const isSingleRole = roles.length === 1;
 
   const decision = await decide({
     model: DECISION_MODEL,
