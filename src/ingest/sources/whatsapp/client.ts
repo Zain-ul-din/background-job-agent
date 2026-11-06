@@ -9,6 +9,21 @@ import { randomUUID } from "node:crypto";
 
 const AUTH_STATE_DIR = ".whatsapp_auth";
 const trackedSuffixes = ["@broadcast", "@newsletter"];
+const filterKeywords = [
+  "job",
+  "hiring",
+  "freelance",
+  "gig",
+  "internship",
+  "software",
+  "web",
+  "app",
+  "game",
+  "remote",
+  "technology",
+  "it",
+  "education",
+];
 
 const isTrackedChat = (jid: string): boolean =>
   jid !== "status@broadcast" &&
@@ -74,13 +89,7 @@ export async function connectWhatsApp(
         if (!metadata) continue;
 
         const channelName = extractChannelName(metadata);
-        const filterKeywords = [
-          "job",
-          "hiring",
-          "freelance",
-          "gig",
-          "internship",
-        ];
+
         const isRelevantChannel = filterKeywords.some((kw) =>
           channelName.toLowerCase().includes(kw),
         );
