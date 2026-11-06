@@ -8,6 +8,8 @@ This AI Agent runs on the Vercel AI SDK, which means you can choose from [availa
 
 For minimal setup, only `openai-subscription` and `mistral` models are supported ([see more here](/src/lib/models.ts)).
 
+Email generation and classification are configured separately in [src/config.ts](/src/config.ts): `model` handles email/handoff generation, `decisionModel` handles job classification. Classification currently uses Cloudflare's free `clef` decision model, so it needs Cloudflare credentials too.
+
 **Setup credentials:** If you plan to use a provider API key, it's straightforward to get the API key from their platform. Using `subscription` is a bit trickier - you need to authenticate in the browser. We recommend using a tool like [opencode](https://github.com/agentic-labs/opencode) to handle this. Once authenticated, find your credentials at `~/.local/share/opencode/auth.json`.
 
 ## Step 1: Configure Your Environment
@@ -24,6 +26,10 @@ MISTRAL_API_KEY=your_mistral_key_here
 # OR
 OPENAI_OAUTH_ACCESS_TOKEN=your_openai_token
 CHATGPT_ACCOUNT_ID=your_account_id
+
+# Cloudflare (job classification via the free clef model)
+CLOUDFLARE_ACCOUNT_ID=your_cloudflare_account_id
+CLOUDFLARE_API_TOKEN=your_cloudflare_api_token
 
 # Google OAuth (for Gmail)
 GOOGLE_USER=your_email@gmail.com

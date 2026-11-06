@@ -36,6 +36,8 @@ Copy `.env.example` → `.env`:
 - **AI (pick one provider):** `MISTRAL_API_KEY` **or** `OPENAI_OAUTH_ACCESS_TOKEN` + `CHATGPT_ACCOUNT_ID`.
   The active model is selected in [src/config.ts](src/config.ts) from [src/lib/models.ts](src/lib/models.ts)
   (subscription creds can be copied from `~/.local/share/opencode/auth.json`).
+- **Cloudflare:** `CLOUDFLARE_ACCOUNT_ID` + `CLOUDFLARE_API_TOKEN` — used by the `clef` decision model
+  that classifies job postings (see [src/lib/ai-providers/cloudflare.ts](src/lib/ai-providers/cloudflare.ts)).
 - **Google:** `GOOGLE_USER`, `GOOGLE_CLIENT_ID`, `GOOGLE_CLIENT_SECRET`, `BASE_URL` (default `http://localhost:3010`).
 - **DB:** `DB_FILE_NAME=file:local.db`
 - **Inngest:** `INNGEST_EVENT_KEY`, `INNGEST_SIGNING_KEY` (dev values are fine), optional `INNGEST_DEV=true`.
@@ -84,7 +86,7 @@ curl -X POST http://localhost:3010/process \
 
 That emits `agent/job.process` → the `job-agent` Inngest function ([src/ingest/index.ts](src/ingest/index.ts)):
 
-1. Classify the posting against the configured roles (skip when `not_relevant`)
+1. Classify the posting against the configured roles using the `clef` decision model (skip when `not_relevant`)
 2. Extract recruiter emails from the post and send a personalized application
 3. Save the email thread, then generate outreach handoffs
 4. Sleep 12h waiting for a response
