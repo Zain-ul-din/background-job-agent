@@ -1,6 +1,16 @@
-# Background Job Agent
+<div align="left">
+  <h1>
+  Background Job Agent
+  </h1>
+  <p>
+    An automated system that monitors job postings from various sources and applies to them on your behalf by sending personalized emails to recruiters.
+  </p>
+</div>
 
-An automated system that monitors job postings from various sources and applies to them on your behalf by sending personalized emails to recruiters.
+
+<img width="1734" height="907" alt="Background Job Agent Workflow (1)" src="https://github.com/user-attachments/assets/1ef071d0-e4da-4ff4-8391-65c878f6da0d" />
+
+
 
 ## How It Works
 
