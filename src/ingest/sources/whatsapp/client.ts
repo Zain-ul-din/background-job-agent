@@ -74,7 +74,17 @@ export async function connectWhatsApp(
         if (!metadata) continue;
 
         const channelName = extractChannelName(metadata);
-        if (channelName.toLowerCase().includes("job")) {
+        const filterKeywords = [
+          "job",
+          "hiring",
+          "freelance",
+          "gig",
+          "internship",
+        ];
+        const isRelevantChannel = filterKeywords.some((kw) =>
+          channelName.toLowerCase().includes(kw),
+        );
+        if (isRelevantChannel) {
           const post =
             message.message?.conversation ||
             message.message?.imageMessage?.caption;
