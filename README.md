@@ -23,8 +23,8 @@ This agent automates that entire process:
 
 1. **Monitors job sources** - Watches for new job postings from platforms you configure (e.g., WhatsApp job channels)
 2. **Classifies jobs** - Uses AI to understand if a job posting is relevant to you
-3. **Applies automatically** - Sends personalized emails to recruiters when a good match is found
-4. **Tracks applications** - Keeps records of what was applied to and the responses
+3. **Applies automatically** - Emails recruiters using the template of the best-matching role
+4. **Tracks applications** - Records each run, its classification and the email threads, and generates follow-up outreach tasks you can query over MCP
 
 ## Architecture
 

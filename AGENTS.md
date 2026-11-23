@@ -3,7 +3,7 @@
 Note: Project is still under development.
 
 Background Job Agent — watches configured job sources, classifies postings with AI,
-and applies by sending personalized Gmail emails + tracking outreach handoffs.
+and applies by emailing recruiters through Gmail (role template) + tracking outreach handoffs.
 
 ## Commands
 
@@ -27,7 +27,7 @@ Ask which roles the user wants to target, then have them define each role at
 
 Each role needs: **name**, **email_template**, **email_subject**, **skills**
 (slug is derived from the name: lowercase, spaces → `-`).
-Roles drive AI classification and the personalized application email.
+Roles drive AI classification; the matched role's template/subject is sent as the application email, unchanged.
 
 ### 2. Environment + Google OAuth
 
@@ -41,6 +41,7 @@ Copy `.env.example` → `.env`:
 - **Google:** `GOOGLE_USER`, `GOOGLE_CLIENT_ID`, `GOOGLE_CLIENT_SECRET`, `BASE_URL` (default `http://localhost:3010`).
 - **DB:** `DB_FILE_NAME=file:local.db`
 - **Inngest:** `INNGEST_EVENT_KEY`, `INNGEST_SIGNING_KEY` (dev values are fine), optional `INNGEST_DEV=true`.
+- **Optional:** `PORT` (default `3010`).
 
 Google Developer Console walkthrough:
 
@@ -69,8 +70,8 @@ On first run an interactive multiselect asks which sources to enable; the choice
 persisted to `sources.json` ([src/lib/sources-db.ts](src/lib/sources-db.ts)) and reused afterwards.
 
 - **WhatsApp** ([src/ingest/sources/whatsapp](src/ingest/sources/whatsapp)): scan the QR code in
-  the terminal. It picks up posts from **job channels only** (newsletter/broadcast chats whose
-  channel name contains "job") and **skips every other message**. Lost session → delete
+  the terminal. It picks up posts from **job channels only** (newsletter channels whose name
+  contains one of `filterKeywords` in `client.ts`: `job`, `hiring`, `freelance`, `gig`, `internship`, `software`, `web`, `app`, `game`, `remote`, `technology`, `it`, `education`) and **skips every other message**. Lost session → delete
   `.whatsapp_auth/` and restart.
 - **None** — skip sources and feed postings manually (next step).
 
@@ -87,11 +88,13 @@ curl -X POST http://localhost:3010/process \
 That emits `agent/job.process` → the `job-agent` Inngest function ([src/ingest/index.ts](src/ingest/index.ts)):
 
 1. Classify the posting against the configured roles using the `clef` decision model (skip when `not_relevant`)
-2. Extract recruiter emails from the post and send a personalized application
+2. Extract recruiter emails from the post and send the matched role's template to each
 3. Save the email thread, then generate outreach handoffs
 
 Query pending handoffs / run details through the MCP server (`pnpm mcp`) —
-tools: `get-handoffs`, `get-run`, `get-handoffs-by-ids`, `report-outreach-handoff`.
+tools: `get-handoffs`, `get-run`, `get-handoffs-by-run`, `get-handoffs-by-ids`, `report-outreach-handoff`.
+
+`/process` requires `post`; optional `id` becomes the run id (re-sending the same id won't create a second run).
 
 ## Recommended Job Post Sources
 

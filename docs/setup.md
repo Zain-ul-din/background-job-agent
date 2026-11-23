@@ -8,9 +8,9 @@ This AI Agent runs on the Vercel AI SDK, which means you can choose from [availa
 
 For minimal setup, only `openai-subscription` and `mistral` models are supported ([see more here](/src/lib/models.ts)).
 
-Email generation and classification are configured separately in [src/config.ts](/src/config.ts): `model` handles email/handoff generation, `decisionModel` handles job classification. Classification currently uses Cloudflare's free `clef` decision model, so it needs Cloudflare credentials too.
+Models are configured in [src/config.ts](/src/config.ts): `model` generates outreach handoffs, `decisionModel` handles job classification. Application emails are not AI-generated: each one is the matching role's email template and subject, sent as written. Classification currently uses Cloudflare's free `clef` decision model, so it needs Cloudflare credentials too.
 
-**Setup credentials:** If you plan to use a provider API key, it's straightforward to get the API key from their platform. Using `subscription` is a bit trickier - you need to authenticate in the browser. We recommend using a tool like [opencode](https://github.com/agentic-labs/opencode) to handle this. Once authenticated, find your credentials at `~/.local/share/opencode/auth.json`.
+**Setup credentials:** If you plan to use a provider API key, it's straightforward to get the API key from their platform. Using `subscription` is a bit trickier - you need to authenticate in the browser. We recommend using a tool like [opencode](https://github.com/sst/opencode) to handle this. Once authenticated, find your credentials at `~/.local/share/opencode/auth.json`.
 
 ## Step 1: Configure Your Environment
 
@@ -43,6 +43,8 @@ DB_FILE_NAME=file:local.db
 # Inngest (local)
 INNGEST_EVENT_KEY=test-key
 INNGEST_SIGNING_KEY=test-signing-key
+# Optional: run the Inngest SDK in dev mode
+# INNGEST_DEV=true
 ```
 
 **Getting Google OAuth credentials:**
@@ -65,6 +67,12 @@ INNGEST_SIGNING_KEY=test-signing-key
 
 Now let's get everything running.
 
+First, create the SQLite tables (only needed once, and again after schema changes):
+
+```bash
+npx drizzle-kit push
+```
+
 **Why Docker?** We use Docker to run the Inngest dev server, which schedules and retries each job-processing step. Your roles, runs and email threads live in the local SQLite database (`DB_FILE_NAME`).
 
 ```bash
@@ -80,12 +88,12 @@ This will:
 
 The agent needs to know what kind of jobs you're looking for.
 
-**Why?** This helps the AI classify jobs and write relevant, personalized emails.
+**Why?** The AI classifies each job against these roles, and the best-matching role's template is the email that gets sent.
 
 Open your browser to `http://localhost:3010/roles.html` and fill in:
 
 - Role name (e.g., "Senior Frontend Engineer")
-- Email template (how you want to introduce yourself)
+- Email template (the email body sent to recruiters, as written)
 - Email subject line
 - Key skills you want to highlight
 
@@ -108,7 +116,7 @@ If you select WhatsApp:
 
 1. A QR code will appear in your terminal
 2. Scan it with WhatsApp on your phone
-3. The agent will now monitor channels with "job" in the name
+3. The agent will now monitor WhatsApp channels (newsletters) whose name contains one of: `job`, `hiring`, `freelance`, `gig`, `internship`, `software`, `web`, `app`, `game`, `remote`, `technology`, `it`, `education`. Every other chat is ignored.
 
 ## Step 5: Authorize Gmail
 
@@ -146,6 +154,8 @@ curl -X POST http://localhost:3010/process \
   }'
 ```
 
+`post` is required. `id` is optional: it identifies the run, so re-submitting the same `id` won't start a second run. If you leave it out, one is generated. The response includes it: `{"success": true, "id": "unique-job-id"}`.
+
 ### View Application Status
 
 The agent tracks all applications in the database. You can use the MCP server to query:
@@ -156,9 +166,10 @@ pnpm mcp
 
 This gives you tools to:
 
-- List pending outreach tasks
-- View job details
-- Report back on responses
+- `get-handoffs`: list outreach tasks
+- `get-run`: view a run (job post, classification, email threads)
+- `get-handoffs-by-run` / `get-handoffs-by-ids`: fetch specific tasks
+- `report-outreach-handoff`: report a task's outcome
 
 ## Stopping the Application
 
