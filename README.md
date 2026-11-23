@@ -3,6 +3,9 @@
   Background Job Agent
   </h1>
   <p>
+    <a href="https://github.com/Zain-ul-din/background-job-agent/actions/workflows/test.yml"><img alt="Tests" src="https://github.com/Zain-ul-din/background-job-agent/actions/workflows/test.yml/badge.svg" /></a>
+  </p>
+  <p>
     An automated system that monitors job postings from various sources and applies to them on your behalf by sending personalized emails to recruiters.
   </p>
 </div>
@@ -41,12 +44,20 @@ Inngest Dashboard:
 # 1. Configure environment (copy .env.example to .env and fill in values)
 cp .env.example .env
 
-# 2. Define your target roles
-pnpm run db:seed
+# 2. Create the SQLite tables
+npx drizzle-kit push
 
-# 3. Start the application
+# 3. Start the application, then define your target roles at http://localhost:3010/roles.html
 pnpm dev
 ```
+
+## Tests
+
+```bash
+pnpm test
+```
+
+The suite covers the `/process` endpoint, the job-agent Inngest pipeline, job classification and the data layer. It runs against an in-memory SQLite database with the AI providers and Gmail mocked, so no API keys are needed. CI runs it on every push and pull request.
 
 ## What's Next?
 

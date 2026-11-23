@@ -9,10 +9,10 @@ and applies by sending personalized Gmail emails + tracking outreach handoffs.
 
 | Command            | What it does                                          |
 | ------------------ | ----------------------------------------------------- |
-| `pnpm dev`         | `docker-compose up -d` (Postgres + Inngest) then runs `src/index.ts` on port `3010` |
+| `pnpm dev`         | `docker-compose up -d` (Inngest dev server) then runs `src/index.ts` on port `3010` |
 | `pnpm mcp`         | Starts the outreach-handoffs MCP server (stdio)       |
-| `pnpm docker:stop` | Stops Inngest + Postgres containers                   |
-| `pnpm db:seed`     | Placeholder — `scripts/seed-db.ts` is still a TODO    |
+| `pnpm docker:stop` | Stops the Inngest container                           |
+| `pnpm test`        | Runs the vitest suite in `tests/` (in-memory SQLite, AI/Gmail mocked) |
 | `npx drizzle-kit push` | Applies schema (`src/lib/db/schema.ts`) to `DB_FILE_NAME` SQLite db |
 
 ## Setup Guide
@@ -58,7 +58,7 @@ Google Developer Console walkthrough:
 
 ```bash
 npx drizzle-kit push   # once, creates the SQLite tables
-pnpm dev               # boots Docker (Postgres + Inngest) + the app
+pnpm dev               # boots Docker (Inngest) + the app
 ```
 
 Inngest dashboard: `http://localhost:8288` (SDK is served at `/api/inngest`).
@@ -89,7 +89,6 @@ That emits `agent/job.process` → the `job-agent` Inngest function ([src/ingest
 1. Classify the posting against the configured roles using the `clef` decision model (skip when `not_relevant`)
 2. Extract recruiter emails from the post and send a personalized application
 3. Save the email thread, then generate outreach handoffs
-4. Sleep 12h waiting for a response
 
 Query pending handoffs / run details through the MCP server (`pnpm mcp`) —
 tools: `get-handoffs`, `get-run`, `get-handoffs-by-ids`, `report-outreach-handoff`.
