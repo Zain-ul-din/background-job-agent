@@ -65,7 +65,7 @@ INNGEST_SIGNING_KEY=test-signing-key
 
 Now let's get everything running.
 
-**Why Docker?** We use Docker to run Inngest with a persistent database. This means your job applications survive computer restarts.
+**Why Docker?** We use Docker to run the Inngest dev server, which schedules and retries each job-processing step. Your roles, runs and email threads live in the local SQLite database (`DB_FILE_NAME`).
 
 ```bash
 pnpm dev
@@ -73,7 +73,7 @@ pnpm dev
 
 This will:
 
-1. Start PostgreSQL and Inngest in Docker (first run downloads images)
+1. Start Inngest in Docker (first run downloads the image)
 2. Start your application server
 
 ## Step 3: Define Your Target Roles
@@ -166,7 +166,7 @@ This gives you tools to:
 pnpm docker:stop
 ```
 
-This stops the Docker containers (PostgreSQL + Inngest). Your data is preserved in Docker volumes, so you won't lose anything.
+This stops the Inngest container. Your roles, runs and email threads are kept in the local SQLite database.
 
 ## Troubleshooting
 
@@ -174,7 +174,6 @@ This stops the Docker containers (PostgreSQL + Inngest). Your data is preserved 
 
 ```bash
 docker-compose logs inngest
-docker-compose logs postgres
 ```
 
 **WhatsApp connection issues?**

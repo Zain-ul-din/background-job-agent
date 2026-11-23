@@ -1,24 +1,6 @@
-version: "3.8"
-
 services:
-  postgres:
-    image: postgres:15
-    environment:
-      POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: postgres
-      POSTGRES_DB: inngest
-    volumes:
-      - postgres_data:/var/lib/postgresql/data
-    ports:
-      - "5432:5432"
-    healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U postgres"]
-      interval: 5s
-      timeout: 5s
-      retries: 5
-
   inngest:
-    image: inngest/inngest:latest
+    image: inngest/inngest:v1.49.0
     command:
       [
         "inngest",
@@ -30,11 +12,5 @@ services:
       ]
     ports:
       - "8288:8288"
-    depends_on:
-      postgres:
-        condition: service_healthy
     extra_hosts:
       - "host.docker.internal:host-gateway"
-
-volumes:
-  postgres_data:

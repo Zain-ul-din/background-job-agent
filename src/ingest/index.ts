@@ -11,7 +11,7 @@ import {
 } from "../lib/agent-data";
 
 export const inngest = new Inngest({
-  id: "my-app",
+  id: "background-job-agent",
   eventKey: process.env.INNGEST_EVENT_KEY || "test-key",
   signingKey: process.env.INNGEST_SIGNING_KEY || "test-signing-key",
   isDev: Boolean(process.env.INNGEST_DEV),
@@ -71,8 +71,6 @@ const jobAgent = inngest.createFunction(
         return res;
       });
     }
-
-    await step.sleep("wait-for-response", "12h");
 
     return {
       response: "Applied to all opportunities",
